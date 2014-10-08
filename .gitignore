@@ -1,0 +1,12 @@
+*.7z
+*.zip
+*.o
+*.o.d
+*.class
+R.txt
+R.java
+*.dex
+*.ap_
+*.so
+*.jar
+*.cache
