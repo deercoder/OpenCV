@@ -7,11 +7,11 @@
 //  copy or use the software.
 //
 //
-//                          License Agreement
+//                           License Agreement
 //                For Open Source Computer Vision Library
 //
 // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
-// Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+// Copyright (C) 2009-2012, Willow Garage Inc., all rights reserved.
 // Third party copyrights are property of their respective owners.
 //
 // Redistribution and use in source and binary forms, with or without modification,
@@ -40,33 +40,18 @@
 //
 //M*/
 
-#ifndef __OPENCV_PRECOMP_H__
-#define __OPENCV_PRECOMP_H__
+#ifndef __OPENCV_NONFREE_HPP__
+#define __OPENCV_NONFREE_HPP__
 
-//#include "cvconfig.h"
+#include "features2d.hpp"
 
-#include "opencv2/opencv_modules.hpp"
+namespace cv
+{
 
-#include "nonfree.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/core/internal.hpp"
+CV_EXPORTS_W bool initModule_nonfree();
 
-#if defined(HAVE_OPENCV_GPU) && !defined(ANDROID)
-    #include "opencv2/nonfree/gpu.hpp"
-
-    #if defined(HAVE_CUDA)
-        #include "opencv2/gpu/stream_accessor.hpp"
-        #include "opencv2/gpu/device/common.hpp"
-
-        static inline void throw_nogpu() { CV_Error(CV_StsNotImplemented, "The called functionality is disabled for current build or platform"); }
-    #else
-        static inline void throw_nogpu() { CV_Error(CV_GpuNotSupported, "The library is compiled without GPU support"); }
-    #endif
-#endif
-
-//#ifdef HAVE_OPENCV_OCL
-//#  include "opencv2/nonfree/ocl.hpp"
-//#  include "opencv2/ocl/private/util.hpp"
-//#endif
+}
 
 #endif
+
+/* End of file. */
