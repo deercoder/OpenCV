@@ -14,3 +14,5 @@ R.java
 *.so
 *.jar
 *.cache
+*.sh~
+README~

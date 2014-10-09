@@ -16,7 +16,7 @@ LOCAL_SRC_FILES := libopencv_java.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_C_INCLUDES:= /cygdrive/c/0_DEV/OpenCV-2.4.8-android-sdk/sdk/native/jni/include
+LOCAL_C_INCLUDES:= /home/changliu/OpenCV-2.4.9-android-sdk/sdk/native/jni/include
 LOCAL_MODULE    := test_sift
 LOCAL_CFLAGS    := -Werror -O3 -ffast-math
 LOCAL_LDLIBS    += -llog -ldl 

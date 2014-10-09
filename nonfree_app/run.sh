@@ -7,14 +7,14 @@
 echo "|======================|"
 
 echo "push the executable into the device"
-adb shell "rm -r /data/local/sift"
-adb shell "mkdir -p /data/local/sift"
-adb push ./libs/armeabi /data/local/sift/
-adb push ./img/img1.jpg /data/local/sift/
+#adb shell "rm -r /data/local/sift"
+#adb shell "mkdir -p /data/local/sift"      // mkdir /sdcard/test
+adb push ./libs/armeabi /sdcard/test
+adb push ./img/img1.jpg /sdcard/test
 
 echo "start SIFT computation"
 echo "                        "
-adb shell "cd /data/local/sift && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/local/sift&& chmod 777 ./test_sift &&./test_sift img1.jpg img1_result_output.jpg"
+adb shell "cd /sdcard/test && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/sdcard/test&& chmod 777 ./test_sift &&./test_sift img1.jpg img1_result_output.jpg"
 echo "                        "
 
 echo "fetch the result image back."

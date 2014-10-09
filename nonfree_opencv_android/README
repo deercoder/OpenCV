@@ -1,0 +1,13 @@
+README
+======
+
+
+This project is just for porting SIFT and SURF to android platform using JNI, it solves some compiling error from PC to android,
+some path missing and permission error.
+
+
+
+BTW, after adding the .mk files, we could get .so library under libs folder, move it to another project to use its interface, this
+library could be used directly.
+
+
