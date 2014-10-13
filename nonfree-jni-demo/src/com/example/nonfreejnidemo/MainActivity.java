@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -64,10 +65,11 @@ public class MainActivity extends Activity {
 		    	Log.e("LLL", "come here!");
 		        Bundle bundle = msg.getData();
 		        String value = bundle.getString("finish");
-		        if(value.equals("true"))
+		        if(value != null)
 		        {
+		        	String finishTime = "Finished! processing time = " + value + " s";
 		        	Log.e("LLL", "finish");
-		        	Toast.makeText(MainActivity.this, "Finished!", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(MainActivity.this, finishTime, Toast.LENGTH_SHORT).show();
 				    txtView.setText("Finished! Please check /sdcard/DCIM/img1_result.jpg for result image.");
 		        }
 		    }
@@ -99,13 +101,24 @@ public class MainActivity extends Activity {
 		            @Override
 		            public void run() {
 		            	Looper.prepare();
+		            	Time t1 = new Time(); // or Time t=new Time("GMT+8"); 加上Time Zone资料。  
+		            	t1.setToNow(); // 取得系统时间
+		            	Log.e("LLL", t1.toString());
+		            	
 		            	// Call the JNI interface
 						NonfreeJNILib.runDemo(path);
+						
+						Time t2 = new Time();
+						t2.setToNow();
+						Log.e("LLL", t2.toString());
+						
+						String runTime = Long.toString((t2.toMillis(false) - t1.toMillis(false)) / 1000);
+						Log.e("LLL", "running time in seconds = " + runTime);
 						
 						// send msg after executing the SIFT processing
 				        Message msg = myHandler.obtainMessage();
 				        Bundle b = new Bundle();
-				        b.putString("finish", "true");
+				        b.putString("finish", runTime);
 				        msg.setData(b);    // 向消息中添加数据
 				        myHandler.sendMessage(msg);    // 向Handler发送消息，更新UI
 						
