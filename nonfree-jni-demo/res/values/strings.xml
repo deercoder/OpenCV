@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="nonfree_jni_demo">Nonfree JNI Demo</string>
     <string name="run_demo">Run Demo!</string>
-
+	<string name="explorer">Explorer</string>
+	<string name="dialog_read_from_dir">Open from dir</string>
 </resources>

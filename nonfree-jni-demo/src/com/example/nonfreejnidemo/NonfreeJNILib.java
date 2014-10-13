@@ -22,5 +22,6 @@ public class NonfreeJNILib {
 		}
     }
 
-    public static native void runDemo();
+    public static native void runDemo(String str);
+    public static native void readFromAssetsLibzip();
 }

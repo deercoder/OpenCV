@@ -8,40 +8,98 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/nonfree/features2d.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
-#include <iostream>
+#include <opencv2/features2d/features2d.hpp>
+#include "zip.h"
+#include "nonfree.hpp"
+
 
 using namespace cv;
 using namespace std;
 
 #define  LOG_TAG    "nonfree_jni_demo"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 typedef unsigned char uchar;
 
-int run_demo();
+int run_demo(const char *str);
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_NonfreeJNILib_runDemo(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_NonfreeJNILib_runDemo(JNIEnv * env, jobject obj, jstring str);
+    JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_NonfreeJNILib_readFromAssetsLibzip(JNIEnv* env, jclass tis,jstring assetpath, jstring filename);
 };
 
-JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_NonfreeJNILib_runDemo(JNIEnv * env, jobject obj)
+JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_NonfreeJNILib_runDemo(JNIEnv * env, jobject obj, jstring str)
 {
 	LOGI( "Start run_demo! \n");
-	run_demo();
+	jboolean iscopy;
+	const char *mpath = env->GetStringUTFChars(str, &iscopy);
+	run_demo(mpath);
 	LOGI( "End run_demo!\n");
 }
 
+/*******************************************************************************
+ * Function Name  : java_com_fontlose_ReadAssets_readFromAssetsLibzip
+ * Description    : 定义：public native void  readFromAssetsLibzip(String apkpath,String filename);
+ * Input          : apkpath路径 filename 资源名
+ * Output         : None
+ * Return         : None
+ *******************************************************************************/
+JNIEXPORT void JNICALL Java_com_example_nonfreejnidemo_readFromAssetsLibzip(JNIEnv* env, jclass tis,jstring assetpath, jstring filename)
+{
+	LOGI("ReadAssets");
+	int i = 0;
+	jboolean iscopy;
+	const char *mpath = env->GetStringUTFChars(assetpath, &iscopy);
+	struct zip* apkArchive = zip_open(mpath, 0, NULL);
+	env->ReleaseStringUTFChars(filename, mpath);
 
-int run_demo()
+	struct zip_stat fstat;
+	zip_stat_init(&fstat);
+
+	int numFiles = zip_get_num_files(apkArchive);
+	LOGI("File numFiles %i \n", numFiles);
+	for (i = 0; i < numFiles; i++) {
+		const char* name = zip_get_name(apkArchive, i, 0);
+
+		if (name == NULL) {
+			LOGE("Error reading zip file name at index %d : %s",i, zip_strerror(apkArchive));
+			return;
+		}
+
+		zip_stat(apkArchive, name, 0, &fstat);
+		//LOGI("File %d:%s Size1: %d Size2: %d", i, fstat.name, fstat.size, fstat.comp_size);
+	}
+
+	const char *fname = env->GetStringUTFChars(filename, &iscopy);
+	struct zip_file* file = zip_fopen(apkArchive, fname, 0);
+
+	if (!file) {
+		LOGE("Error opening %s from APK", fname);
+		return;
+	}
+
+	zip_stat(apkArchive, fname, 0, &fstat);
+	env->ReleaseStringUTFChars(filename, fname);
+	char *buffer = (char *) malloc(fstat.size + 1);
+	buffer[fstat.size] = 0;
+	int numBytesRead = zip_fread(file, buffer, fstat.size);
+
+	LOGI(": %s\n", buffer);
+	free(buffer);
+	zip_fclose(file);
+	zip_close(apkArchive);
+}
+
+
+int run_demo(const char *str)
 {
 	//cv::initModule_nonfree();
 	//cout <<"initModule_nonfree() called" << endl;
 
 	// Input and output image path.
-	const char * imgInFile = "/sdcard/nonfree/img1.jpg";
-	const char * imgOutFile = "/sdcard/nonfree/img1_result.jpg";
+	const char * imgInFile = str;
+	const char * imgOutFile = "/sdcard/DCIM/img1_result.jpg";
 
 	Mat image;
 	image = imread(imgInFile, CV_LOAD_IMAGE_COLOR);
