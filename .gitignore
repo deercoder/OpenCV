@@ -1,4 +1,5 @@
 *.7z
+*.apk
 *.mk~
 *.hpp~
 *.cpp~
@@ -16,3 +17,5 @@ R.java
 *.cache
 *.sh~
 README~
+*.xml~
+R.java

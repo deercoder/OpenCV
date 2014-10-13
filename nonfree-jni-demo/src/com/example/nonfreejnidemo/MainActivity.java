@@ -9,9 +9,12 @@ import java.io.File;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -27,6 +30,9 @@ public class MainActivity extends Activity {
 
 	private static final int REQUEST_EX = 1;
 	private Context mContext;
+	private Handler myHandler;
+	private ProgressDialog dialog;
+	public final String TAG = "SIFT";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +41,7 @@ public class MainActivity extends Activity {
 
 		txtView = (TextView)findViewById(R.id.textView1);
 		mContext  = getApplicationContext(); 
-
+		
 		runBtn = (Button)findViewById(R.id.button_run_demo);
 		runBtn.setOnClickListener(new Button.OnClickListener()
 		{
@@ -52,6 +58,20 @@ public class MainActivity extends Activity {
 				startActivityForResult(intent, REQUEST_EX);
 			}
 		});
+		
+		myHandler = new Handler() {
+		    public void handleMessage(Message msg) {
+		    	Log.e("LLL", "come here!");
+		        Bundle bundle = msg.getData();
+		        String value = bundle.getString("finish");
+		        if(value.equals("true"))
+		        {
+		        	Log.e("LLL", "finish");
+		        	Toast.makeText(MainActivity.this, "Finished!", Toast.LENGTH_SHORT).show();
+				    txtView.setText("Finished! Please check /sdcard/DCIM/img1_result.jpg for result image.");
+		        }
+		    }
+		};
 	}
 
 	@Override
@@ -72,20 +92,31 @@ public class MainActivity extends Activity {
 				text.setText("select: "+ path);
 				//getRealPathFromURI (uri);
 
-			    /* 线程体是Clock对象本身，线程名字为"Clock" */
+				final ProgressDialog ringProgressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...",	"Processs Image using OpenCV-SIFT ...", true);
+				ringProgressDialog.setCancelable(false);
+				
 		        Thread processThread = new Thread(new Runnable() {
 		            @Override
 		            public void run() {
 		            	Looper.prepare();
 		            	// Call the JNI interface
 						NonfreeJNILib.runDemo(path);
+						
+						// send msg after executing the SIFT processing
+				        Message msg = myHandler.obtainMessage();
+				        Bundle b = new Bundle();
+				        b.putString("finish", "true");
+				        msg.setData(b);    // 向消息中添加数据
+				        myHandler.sendMessage(msg);    // 向Handler发送消息，更新UI
+						
+				        ringProgressDialog.dismiss();
 		                }
 		        });
 		        processThread.start();
 			}
 		}
 	}
-	
+		
 	private String getRealPathFromURI(Uri contentUri) {
 	    String[] proj = { MediaStore.Images.Media.DATA };
 	    CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
@@ -94,6 +125,13 @@ public class MainActivity extends Activity {
 	    cursor.moveToFirst();
 	    return cursor.getString(column_index);
 	}
+	
+    // Shows the dialog while waiting for image processing
+    public void progressDialog () {
+    	Log.d(TAG, "Starting the \"processing\" dialog.");
+    	dialog = ProgressDialog.show(this.getBaseContext(), "Processing", "Please wait for image to process...", true);
+    }
+	
 	Button runBtn;
 	TextView txtView;
 }
