@@ -5,7 +5,7 @@
 
 #include <jni.h>
 #include <android/log.h>
-
+#include <time.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -97,6 +97,8 @@ int run_demo(const char *str)
 	//cv::initModule_nonfree();
 	//cout <<"initModule_nonfree() called" << endl;
 
+	time_t stime , mtime, etime ;
+
 	// Input and output image path.
 	const char * imgInFile = str;
 	const char * imgOutFile = "/sdcard/DCIM/img1_result.jpg";
@@ -112,15 +114,26 @@ int run_demo(const char *str)
 	vector<KeyPoint> keypoints;
 	Mat descriptors;
 
+	time( &stime ); /* get start time */
+
 	// Create a SIFT keypoint detector.
 	SiftFeatureDetector detector;
 	detector.detect(image, keypoints);
 	LOGI("Detected %d keypoints\n", (int) keypoints.size());
 
+	time( & mtime);
+	LOGE("detect SIFT feature time = %ld\n", mtime - stime);
+
 	// Compute feature description.
 	detector.compute(image,keypoints, descriptors);
 	LOGI("Compute feature.\n");
 
+	time( &etime ); /* get end time */
+
+	LOGE("compute descriptor time = %ld\n", etime - mtime);
+	LOGE("Total time = %ld", etime - stime);
+
+	/*
 	// Store description to "descriptors.des".
 	FileStorage fs;
 	fs.open("descriptors.des", FileStorage::WRITE);
@@ -129,22 +142,23 @@ int run_demo(const char *str)
 	LOGI("Finished writing file.\n");
 	fs.release();
 	LOGI("Released file.\n");
-
+	*/
+	/*
 	// Show keypoints in the output image.
 	Mat outputImg;
 	Scalar keypointColor = Scalar(255, 0, 0);
 	drawKeypoints(image, keypoints, outputImg, keypointColor, DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 	LOGI("Drew keypoints in output image file.\n");
-
+*/
 #ifdef WIN32
 	namedWindow("Output image", CV_WINDOW_AUTOSIZE );
 	imshow("Output image", outputImg);
 	waitKey(0);
 #endif
-	
+	/*
 	LOGI("Generate the output image.\n");
 	imwrite(imgOutFile, outputImg);
-
+	*/
 	LOGI("Done.\n");
 	return 0;
 }
