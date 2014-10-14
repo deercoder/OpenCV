@@ -137,14 +137,15 @@ int run_demo(const char *str)
 	// [liuchang start]
 	time( &stime ); /* get start time */
 
-	detector.detect(image, keypoints);
+	SurfFeatureDetector surf_detector;
+	surf_detector.detect(image, keypoints);
 	LOGI("Detected %d keypoints for SURF\n", (int) keypoints.size());
 
 	time( & mtime);
 	LOGE("detect SURF feature time = %ld\n", mtime - stime);
 
 	// Compute feature description.
-	detector.compute(image,keypoints, descriptors);
+	surf_detector.compute(image,keypoints, descriptors);
 	LOGI("Compute feature.\n");
 
 	time( &etime ); /* get end time */
